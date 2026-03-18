@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verde | Asistente de Finanzas Sostenibles</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --verde-primary: #0F766E;
+            --verde-light: #2DD4BF;
+            --verde-soft: #99F6E4;
+            --verde-dark: #134E4A;
+            --tierra: #D97706;
+            --tierra-light: #FEF3C7;
+            --bg-cream: #FAFAF9;
+            --bg-white: #FFFFFF;
+            --text-primary: #1C1917;
+            --text-secondary: #57534E;
+            --text-muted: #A8A29E;
+            --border: #E7E5E4;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -1px rgba(0,0,0,0.04);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #F0FDFA 0%, #FAFAF9 50%, #FEF3C7 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh;
+            max-width: 880px;
+            margin: 0 auto;
+            background: var(--bg-white);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-white);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-shrink: 0;
+        }
+
+        .header-logo {
+            width: 46px;
+            height: 46px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .header-logo svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .header-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .header-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.4rem;
+            font-weight: 400;
+            color: var(--verde-dark);
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-subtitle {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .header-badge {
+            padding: 5px 10px;
+            background: linear-gradient(135deg, var(--verde-soft), #A7F3D0);
+            color: var(--verde-dark);
+            font-size: 0.68rem;
+            font-weight: 600;
+            border-radius: var(--radius-full);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            flex-shrink: 0;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            max-width: 85%;
+            animation: messageIn 0.3s ease-out;
+        }
+
+        @keyframes messageIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.85rem;
+            font-weight: 600;
+            overflow: hidden;
+        }
+
+        .message.assistant .message-avatar {
+            background: linear-gradient(145deg, var(--verde-primary), var(--verde-light));
+            padding: 6px;
+        }
+
+        .message.assistant .message-avatar svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .message.user .message-avatar {
+            background: var(--border);
+            color: var(--text-secondary);
+        }
+
+        .message-content {
+            padding: 14px 18px;
+            border-radius: var(--radius-lg);
+            font-size: 0.938rem;
+            line-height: 1.7;
+        }
+
+        .message.assistant .message-content {
+            background: var(--bg-cream);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: var(--radius-sm);
+        }
+
+        .message.user .message-content {
+            background: var(--verde-primary);
+            color: white;
+            border-bottom-right-radius: var(--radius-sm);
+        }
+
+        .message-content p {
+            margin-bottom: 14px;
+        }
+
+        .message-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .message-content strong {
+            font-weight: 600;
+            color: var(--verde-dark);
+        }
+
+        .message.user .message-content strong {
+            color: white;
+        }
+
+        .message-content em {
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        .message-content code {
+            background: rgba(0,0,0,0.06);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.85em;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 8px 0;
+            align-items: center;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: var(--verde-light);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .input-container {
+            padding: 16px 20px;
+            background: var(--bg-white);
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            background: var(--bg-cream);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 8px 8px 8px 18px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--verde-primary);
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+        }
+
+        .input-wrapper textarea {
+            flex: 1;
+            border: none;
+            background: none;
+            font-family: inherit;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            color: var(--text-primary);
+            min-height: 24px;
+            max-height: 120px;
+            padding: 6px 0;
+        }
+
+        .input-wrapper textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .send-button {
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: var(--verde-primary);
+            color: white;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, transform 0.1s;
+            flex-shrink: 0;
+        }
+
+        .send-button:hover:not(:disabled) {
+            background: var(--verde-dark);
+        }
+
+        .send-button:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        .send-button:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        .send-button svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .welcome-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px;
+            text-align: center;
+        }
+
+        .welcome-logo {
+            width: 88px;
+            height: 88px;
+            margin-bottom: 24px;
+            filter: drop-shadow(0 4px 12px rgba(15, 118, 110, 0.2));
+        }
+
+        .welcome-logo svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .welcome-greeting {
+            font-size: 1rem;
+            color: var(--verde-primary);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .welcome-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.85rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+        }
+
+        .welcome-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            max-width: 420px;
+            margin-bottom: 36px;
+            line-height: 1.6;
+        }
+
+        .welcome-section-label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 14px;
+            font-weight: 600;
+        }
+
+        .welcome-chips {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .welcome-chip {
+            padding: 14px 18px;
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            line-height: 1.5;
+        }
+
+        .welcome-chip:hover {
+            border-color: var(--verde-primary);
+            background: rgba(15, 118, 110, 0.03);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .welcome-chip-icon {
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .welcome-chip-text {
+            flex: 1;
+        }
+
+        .welcome-chip-title {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .welcome-chip-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .footer-info {
+            padding: 10px 20px 14px;
+            text-align: center;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            background: var(--bg-white);
+            line-height: 1.5;
+        }
+
+        .footer-info a {
+            color: var(--verde-primary);
+            text-decoration: none;
+        }
+
+        @media (max-width: 640px) {
+            .app-container {
+                max-width: 100%;
+                box-shadow: none;
+            }
+
+            .header {
+                padding: 12px 16px;
+            }
+
+            .header-badge {
+                display: none;
+            }
+
+            .header-title {
+                font-size: 1.25rem;
+            }
+
+            .chat-container {
+                padding: 16px;
+            }
+
+            .message {
+                max-width: 92%;
+            }
+
+            .input-container {
+                padding: 12px 16px;
+            }
+
+            .welcome-container {
+                padding: 32px 20px;
+            }
+
+            .welcome-logo {
+                width: 72px;
+                height: 72px;
+            }
+
+            .welcome-title {
+                font-size: 1.5rem;
+            }
+
+            .welcome-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .welcome-chip {
+                padding: 12px 14px;
+            }
+        }
+
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .message-content ul, .message-content ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .message-content li {
+            margin: 6px 0;
+        }
+
+        .message-content li::marker {
+            color: var(--verde-primary);
+        }
+
+        .error-message {
+            background: #FEF2F2 !important;
+            border-color: #FECACA !important;
+            color: #991B1B !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="header-logo">
+                <svg viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="46" height="46" rx="12" fill="url(#logoGrad)"/>
+                    <path d="M23 12C23 12 15 16 15 24C15 28.5 18 32 23 33C28 32 31 28.5 31 24C31 16 23 12 23 12Z" fill="white" fill-opacity="0.9"/>
+                    <path d="M23 18V30" stroke="#0F766E" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M23 22C20 22 18 24 18 24" stroke="#0F766E" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M23 26C26 26 28 24 28 24" stroke="#0F766E" stroke-width="1.5" stroke-linecap="round"/>
+                    <circle cx="35" cy="11" r="4" fill="#FBBF24"/>
+                    <defs>
+                        <linearGradient id="logoGrad" x1="0" y1="0" x2="46" y2="46" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#0F766E"/>
+                            <stop offset="1" stop-color="#14B8A6"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div class="header-info">
+                <h1 class="header-title">Verde</h1>
+                <p class="header-subtitle">Tu guía en normativa ASG · Circular 015/2025</p>
+            </div>
+            <span class="header-badge">Beta</span>
+        </header>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="welcome-container" id="welcomeState">
+                <div class="welcome-logo">
+                    <svg viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="88" height="88" rx="22" fill="url(#welcomeGrad)"/>
+                        <path d="M44 20C44 20 28 28 28 44C28 53 34 60 44 62C54 60 60 53 60 44C60 28 44 20 44 20Z" fill="white" fill-opacity="0.95"/>
+                        <path d="M44 30V56" stroke="#0F766E" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M44 38C38 38 34 42 34 42" stroke="#0F766E" stroke-width="2.5" stroke-linecap="round"/>
+                        <path d="M44 48C50 48 54 44 54 44" stroke="#0F766E" stroke-width="2.5" stroke-linecap="round"/>
+                        <circle cx="68" cy="20" r="8" fill="#FBBF24"/>
+                        <circle cx="68" cy="20" r="4" fill="#FEF3C7"/>
+                        <defs>
+                            <linearGradient id="welcomeGrad" x1="0" y1="0" x2="88" y2="88" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#0F766E"/>
+                                <stop offset="1" stop-color="#2DD4BF"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <p class="welcome-greeting">Hola 👋</p>
+                <h2 class="welcome-title">Soy Verde, tu guía ASG</h2>
+                <p class="welcome-subtitle">
+                    Te ayudo a entender y aplicar la Circular 015 de 2025 sobre gestión de riesgos ambientales, sociales y climáticos. Pregúntame lo que necesites.
+                </p>
+                
+                <p class="welcome-section-label">Consultas frecuentes</p>
+                <div class="welcome-chips">
+                    <button class="welcome-chip" onclick="sendSuggestion('Necesito armar el plan de implementación para mi entidad. ¿Qué debe incluir según la SFC?')">
+                        <span class="welcome-chip-icon">📋</span>
+                        <span class="welcome-chip-text">
+                            <span class="welcome-chip-title">Armar el plan de implementación</span>
+                            <span class="welcome-chip-desc">Qué debe incluir y estructura recomendada</span>
+                        </span>
+                    </button>
+                    <button class="welcome-chip" onclick="sendSuggestion('¿Cómo calculo el índice de exposición a riesgos físicos (IERF)? Dame la fórmula y un ejemplo.')">
+                        <span class="welcome-chip-icon">📊</span>
+                        <span class="welcome-chip-text">
+                            <span class="welcome-chip-title">Calcular indicadores de riesgo</span>
+                            <span class="welcome-chip-desc">Fórmulas del IERF, IRTE, IERS y otros</span>
+                        </span>
+                    </button>
+                    <button class="welcome-chip" onclick="sendSuggestion('Somos una fiduciaria. ¿Qué secciones de la Circular 015 nos aplican y cuáles no?')">
+                        <span class="welcome-chip-icon">🏦</span>
+                        <span class="welcome-chip-text">
+                            <span class="welcome-chip-title">Qué aplica a mi tipo de entidad</span>
+                            <span class="welcome-chip-desc">Alcance específico según tu sector</span>
+                        </span>
+                    </button>
+                    <button class="welcome-chip" onclick="sendSuggestion('¿Cuáles son las fechas límite? El plan va a la SFC en abril 2026, ¿cierto?')">
+                        <span class="welcome-chip-icon">📅</span>
+                        <span class="welcome-chip-text">
+                            <span class="welcome-chip-title">Fechas y plazos clave</span>
+                            <span class="welcome-chip-desc">Cronograma de implementación</span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <div class="input-wrapper">
+                <textarea 
+                    id="messageInput" 
+                    placeholder="Escribe tu consulta sobre la Circular 015..."
+                    rows="1"
+                    onkeydown="handleKeyDown(event)"
+                    oninput="autoResize(this)"
+                ></textarea>
+                <button class="send-button" id="sendButton" onclick="sendMessage()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="footer-info">
+            Basado en Circular Externa 015/2025, Carta Circular 067/2025 y Anexo 1 Cap. XXXIII de la SFC<br>
+            Proyecto de <a href="https://gggi.org" target="_blank">GGGI</a> · Herramienta informativa, no reemplaza asesoría legal
+        </div>
+    </div>
+
+    <script>
+        let conversationHistory = [];
+
+        const chatContainer = document.getElementById('chatContainer');
+        const welcomeState = document.getElementById('welcomeState');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function sendSuggestion(text) {
+            messageInput.value = text;
+            sendMessage();
+        }
+
+        function formatMessage(text) {
+            text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+            text = text.replace(/^- (.+)$/gm, '<li>$1</li>');
+            text = text.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+            text = text.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+            
+            const paragraphs = text.split('\n\n');
+            text = paragraphs.map(p => {
+                if (p.startsWith('<ul>') || p.startsWith('<ol>') || p.startsWith('<li>')) {
+                    return p;
+                }
+                return `<p>${p.replace(/\n/g, '<br>')}</p>`;
+            }).join('');
+            
+            return text;
+        }
+
+        function addMessage(role, content, isError = false) {
+            welcomeState.classList.add('hidden');
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            
+            if (role === 'assistant') {
+                avatar.innerHTML = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 4C12 4 6 7 6 13C6 16.5 8.5 19 12 20C15.5 19 18 16.5 18 13C18 7 12 4 12 4Z" fill="white" fill-opacity="0.9"/>
+                    <path d="M12 8V17" stroke="#0F766E" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M12 11C10 11 9 12.5 9 12.5" stroke="#0F766E" stroke-width="1.2" stroke-linecap="round"/>
+                    <path d="M12 14C14 14 15 12.5 15 12.5" stroke="#0F766E" stroke-width="1.2" stroke-linecap="round"/>
+                </svg>`;
+            } else {
+                avatar.textContent = '👤';
+            }
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content' + (isError ? ' error-message' : '');
+            contentDiv.innerHTML = formatMessage(content);
+
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(contentDiv);
+            chatContainer.appendChild(messageDiv);
+
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            return messageDiv;
+        }
+
+        function addTypingIndicator() {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message assistant';
+            messageDiv.id = 'typingIndicator';
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.innerHTML = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 4C12 4 6 7 6 13C6 16.5 8.5 19 12 20C15.5 19 18 16.5 18 13C18 7 12 4 12 4Z" fill="white" fill-opacity="0.9"/>
+                <path d="M12 8V17" stroke="#0F766E" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M12 11C10 11 9 12.5 9 12.5" stroke="#0F766E" stroke-width="1.2" stroke-linecap="round"/>
+                <path d="M12 14C14 14 15 12.5 15 12.5" stroke="#0F766E" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>`;
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(contentDiv);
+            chatContainer.appendChild(messageDiv);
+
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            sendButton.disabled = true;
+
+            addMessage('user', message);
+
+            conversationHistory.push({
+                role: 'user',
+                content: message
+            });
+
+            addTypingIndicator();
+
+            try {
+                // Llamar al backend serverless
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        messages: conversationHistory
+                    })
+                });
+
+                const data = await response.json();
+                
+                removeTypingIndicator();
+
+                if (data.success && data.message) {
+                    addMessage('assistant', data.message);
+
+                    conversationHistory.push({
+                        role: 'assistant',
+                        content: data.message
+                    });
+                } else if (data.error) {
+                    addMessage('assistant', `⚠️ ${data.error}`, true);
+                } else {
+                    addMessage('assistant', '⚠️ Hubo un error inesperado. Por favor intenta de nuevo.', true);
+                }
+
+            } catch (error) {
+                removeTypingIndicator();
+                console.error('Error:', error);
+                addMessage('assistant', '⚠️ No pude conectarme al servidor. Verifica tu conexión e intenta de nuevo.', true);
+            }
+
+            sendButton.disabled = false;
+            messageInput.focus();
+        }
+
+        window.addEventListener('load', () => {
+            messageInput.focus();
+        });
+    </script>
+</body>
+</html>
